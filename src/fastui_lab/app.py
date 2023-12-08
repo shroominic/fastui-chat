@@ -86,7 +86,7 @@ async def html_landing():  # Added the missing colon here
     return HTMLResponse(prebuilt_html(title="FastUI Demo"))
 
 
-def startapp():
+def start():
     import uvicorn
 
     uvicorn.run(app)

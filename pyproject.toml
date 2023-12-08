@@ -19,7 +19,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-startapp = "fastui_lab.__main__:startapp"
+startapp = "fastui_lab.app:start"
 
 [tool.rye]
 managed = true
@@ -29,3 +29,9 @@ dev-dependencies = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.mypy]
+mypy_path = "src/"
+ignore_missing_imports = true
+follow_imports = "skip"
+exclude = "(fastui/.*|venv/.*|dist/.*|wheels/.*|.*egg-info)"
