@@ -15,10 +15,7 @@ memory.chat_memory.add_ai_message("How can I help you today?")
 
 @router.get("/api/", response_model=FastUI, response_model_exclude_none=True)
 async def chat_ui(user_msg: str | None = None) -> list[AnyComponent]:
-    """
-    Show a table of users, `/api` is the endpoint the frontend will connect to
-    when a user fixes `/` to fetch components to render.
-    """
+    """Minimalistic Chat UI"""
     if user_msg:
         await chat.apredict(input=user_msg)
     return [
