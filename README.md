@@ -1,4 +1,4 @@
-# fastui-lab
+# fastui-chat
 
 A minimalistic ChatBot Interface in pure python.
 
