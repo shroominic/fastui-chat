@@ -8,10 +8,10 @@ authors = [
 dependencies = [
     "fastui>=0.3.0",
     "fastapi>=0.104.1",
-    "uvicorn>=0.24.0.post1",
-    "openai>=1.5.0",
-    "python-multipart>=0.0.6",
     "langchain>=0.0.350",
+    "uvicorn>=0.24.0.post1",
+    "python-multipart>=0.0.6",
+    "openai>=1.5.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -27,6 +27,7 @@ startapp = "fastui_chat.app:start"
 managed = true
 dev-dependencies = [
     "mypy>=1.7.1",
+    "ruff>=0.1.8",
 ]
 
 [tool.hatch.metadata]
