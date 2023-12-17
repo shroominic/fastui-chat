@@ -1,15 +1,18 @@
 [project]
-name = "fastui-lab"
-version = "0.1.0"
-description = "Add your description here"
+name = "fastui-chatgpt"
+version = "0.0.1"
+description = "Minimalistic chatbot ui using fastapi, fastui and langchain."
 authors = [
-    { name = "Shroominic", email = "db2002dominic@gmail.com" }
+    { name = "Shroominic", email = "contact@shroominic.com" }
 ]
 dependencies = [
-    "fastui>=0.2.0",
+    "fastui>=0.3.0",
     "fastapi>=0.104.1",
     "uvicorn>=0.24.0.post1",
     "click>=8.1.7",
+    "funcchain>=0.1.10",
+    "openai>=1.5.0",
+    "python-multipart>=0.0.6",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
@@ -19,7 +22,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-startapp = "fastui_lab.app:start"
+startapp = "fastui_chatgpt.app:start"
 
 [tool.rye]
 managed = true
