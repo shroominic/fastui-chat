@@ -6,12 +6,9 @@ authors = [
     { name = "Shroominic", email = "contact@shroominic.com" }
 ]
 dependencies = [
-    "fastui>=0.3.0",
-    "fastapi>=0.104.1",
-    "langchain>=0.0.350",
+    "fastui[fastapi] @ git+https://github.com/pydantic/FastUI.git@main#subdirectory=src/python-fastui",
+    "langchain[openai]>=0.0.350",
     "uvicorn>=0.24.0.post1",
-    "python-multipart>=0.0.6",
-    "openai>=1.5.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -32,6 +29,9 @@ dev-dependencies = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fastui_chat"]
 
 [tool.mypy]
 mypy_path = "src/"
