@@ -79,7 +79,6 @@ async def sse_ai_response(user_msg: str) -> StreamingResponse:
 
 
 async def ai_response_generator(user_msg: str) -> AsyncIterable[str]:
-    print(history.messages)
     output, msg = "", ""
     async for chunk in session.astream(user_msg):
         output += chunk.content
