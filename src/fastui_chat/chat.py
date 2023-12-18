@@ -48,7 +48,7 @@ async def chat_history() -> list[AnyComponent]:
     """
     Endpoint for showing the Chat History UI.
     """
-    return [*(ChatMessage(msg.type, msg.content) for msg in history.messages)]
+    return [ChatMessage(msg.type, msg.content) for msg in history.messages]
 
 
 @router.post("/chat/generate", response_model=FastUI, response_model_exclude_none=True)
@@ -79,6 +79,7 @@ async def sse_ai_response(user_msg: str) -> StreamingResponse:
 
 
 async def ai_response_generator(user_msg: str) -> AsyncIterable[str]:
+    print(history.messages)
     output, msg = "", ""
     async for chunk in session.astream(user_msg):
         output += chunk.content
