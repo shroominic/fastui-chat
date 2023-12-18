@@ -1,7 +1,9 @@
+import asyncio
 from fastapi import APIRouter, Form
 from typing import Annotated
 from fastui import AnyComponent, FastUI, components as c
 from fastui.events import PageEvent
+from sse_starlette import EventSourceResponse
 from langchain_core.messages import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -97,10 +99,17 @@ async def chat_generate(user_msg: Annotated[str, Form(...)]) -> list[AnyComponen
             components=[c.Heading(text="You", level=6), c.Text(text=user_msg)],
             class_name="container col-sm-4 my-4",
         ),
-        c.ServerLoad(
-            path="/chat/generate/result?user_msg=" + user_msg,
-            load_trigger=PageEvent(name="generate-result"),
-            components=[c.Text(text="...")],
+        c.Div(
+            components=[
+                c.Heading(text="ChatBot", level=6),
+                c.ServerLoad(
+                    path="/chat/generate/result?user_msg=" + user_msg,
+                    load_trigger=PageEvent(name="generate-result"),
+                    components=[c.Text(text="...")],
+                    sse=True,
+                ),
+            ],
+            class_name="container col-sm-4 my-4",
         ),
         c.Form(
             submit_url="/api/chat/generate",
@@ -120,6 +129,30 @@ async def chat_generate(user_msg: Annotated[str, Form(...)]) -> list[AnyComponen
     ]
 
 
+async def stream(msg: str):
+    """
+    Stream model output as rendered FastUI component.
+    """
+    output = ""
+    
+    try:
+        for chunk in chat_with_history.stream(
+            input={"msg": msg},
+            config={"configurable": {"session_id": "foo"}}
+        ):
+            output += chunk.content
+            ui = FastUI(root=[c.Markdown(text=output)])
+            res = ui.model_dump_json()
+            yield res
+    except Exception as e:
+        yield e
+
+    # avoid the browser reconnecting
+    while True:
+        yield res
+        await asyncio.sleep(60)
+
+
 @router.get(
     "/api/chat/generate/result",
     response_model=FastUI,
@@ -129,16 +162,4 @@ async def chat_generate_result(user_msg: str) -> list[AnyComponent]:
     """
     Endpoint for showing the Chat Generate Result UI.
     """
-    await chat_with_history.ainvoke(
-        input={"msg": user_msg},
-        config={"configurable": {"session_id": "foo"}}
-    )
-    return [
-        c.Div(
-            components=[
-                c.Heading(text="ChatBot", level=6),
-                c.Text(text=memory.messages[-1].content),
-            ],
-            class_name="container col-sm-4 my-4",
-        ),
-    ]
+    return EventSourceResponse(stream(user_msg))
