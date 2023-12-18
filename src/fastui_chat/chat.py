@@ -2,16 +2,30 @@ from fastapi import APIRouter, Form
 from typing import Annotated
 from fastui import AnyComponent, FastUI, components as c
 from fastui.events import PageEvent
-from langchain.chains import ConversationChain
-from langchain.chat_models import ChatOpenAI
-from langchain.memory.buffer import ConversationBufferMemory
+from langchain_core.messages import ChatMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_community.chat_models import ChatOllama
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 router = APIRouter()
 
-memory = ConversationBufferMemory()
-chat = ConversationChain(llm=ChatOpenAI(), memory=memory)
-
-memory.chat_memory.add_ai_message("How can I help you today?")
+memory = ChatMessageHistory(
+    messages=[
+        ChatMessage(content="How can I help you today?", role="ai")
+    ]
+)
+model = ChatOllama()
+prompt = ChatPromptTemplate.from_messages([
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "{msg}")
+])
+chat_with_history = RunnableWithMessageHistory(
+    prompt | model,
+    lambda session_id: memory,  # session_id is always required
+    input_messages_key="msg",
+    history_messages_key="history",
+)
 
 
 @router.get("/api/", response_model=FastUI, response_model_exclude_none=True)
@@ -66,7 +80,7 @@ async def chat_history() -> list[AnyComponent]:
                 ],
                 class_name="container col-sm-4 my-4",
             )
-            for msg in memory.chat_memory.messages
+            for msg in memory.messages
         ),
     ]
 
@@ -115,12 +129,15 @@ async def chat_generate_result(user_msg: str) -> list[AnyComponent]:
     """
     Endpoint for showing the Chat Generate Result UI.
     """
-    await chat.apredict(input=user_msg)
+    await chat_with_history.ainvoke(
+        input={"msg": user_msg},
+        config={"configurable": {"session_id": "foo"}}
+    )
     return [
         c.Div(
             components=[
                 c.Heading(text="ChatBot", level=6),
-                c.Text(text=memory.chat_memory.messages[-1].content),
+                c.Text(text=memory.messages[-1].content),
             ],
             class_name="container col-sm-4 my-4",
         ),
