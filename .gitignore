@@ -10,3 +10,7 @@ wheels/
 .venv
 .env
 tree.yaml
+
+# rye 
+.python-version
+requirements-dev.lock
