@@ -14,8 +14,6 @@ A minimalistic ChatBot Interface in pure python.
 
 ## TODO
 
-- [ ] Stream AI Message
-
 - [ ] Add model selection
 
 - [ ] Store previous chats
