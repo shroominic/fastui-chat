@@ -25,6 +25,8 @@ class ChatMessage(c.Div):
         content: str,
         **data: Any,
     ) -> None:
+        if msg_type == "AIMessageChunk":
+            msg_type = "ai"
         data["msg_type"] = msg_type
         data["content"] = content
         super().__init__(**data, components=[])
