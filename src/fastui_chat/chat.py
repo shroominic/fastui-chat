@@ -1,20 +1,27 @@
+from typing import Annotated, AsyncIterable
+
 from fastapi import APIRouter, Form
-from typing import Annotated
-from fastui import AnyComponent, FastUI, components as c
+from fastapi.responses import StreamingResponse
+from fastui import AnyComponent, FastUI
+from fastui import components as c
 from fastui.events import PageEvent
-from langchain.chains import ConversationChain
 from langchain.chat_models import ChatOpenAI
-from langchain.memory.buffer import ConversationBufferMemory
+from langchain.memory import ChatMessageHistory
+
+from .components import ChatInputForm, ChatMessage
+from .session import ChatSession, create_basic_chat_handler
 
 router = APIRouter()
 
-memory = ConversationBufferMemory()
-chat = ConversationChain(llm=ChatOpenAI(), memory=memory)
+history = ChatMessageHistory()
 
-memory.chat_memory.add_ai_message("How can I help you today?")
+session = ChatSession(
+    chat_handler=create_basic_chat_handler(ChatOpenAI()),
+    history=history,
+)
 
 
-@router.get("/api/", response_model=FastUI, response_model_exclude_none=True)
+@router.get("/", response_model=FastUI, response_model_exclude_none=True)
 async def chat_ui() -> list[AnyComponent]:
     """
     Main endpoint for showing the Chat UI and handling user input.
@@ -27,101 +34,60 @@ async def chat_ui() -> list[AnyComponent]:
                     load_trigger=PageEvent(name="chat-load"),
                     components=[],
                 ),
-                c.Form(
+                ChatInputForm(
                     submit_url="/api/chat/generate",
-                    display_mode="inline",
-                    form_fields=[
-                        c.FormFieldInput(
-                            title="",
-                            name="user_msg",
-                            placeholder="Message ChatBot...",
-                            class_name="py-4",
-                        ),
-                    ],
-                    footer=[
-                        c.FireEvent(event=PageEvent(name="chat-load")),
-                    ],
+                    fire_page_event="chat-load",
                 ),
             ],
         )
     ]
 
 
-@router.get(
-    "/api/chat/history", response_model=FastUI, response_model_exclude_none=True
-)
+@router.get("/chat/history", response_model=FastUI, response_model_exclude_none=True)
 async def chat_history() -> list[AnyComponent]:
     """
     Endpoint for showing the Chat History UI.
     """
-    return [
-        *(
-            c.Div(
-                components=[
-                    c.Heading(
-                        text=("You" if msg.type != "ai" else "ChatBot"),
-                        level=6,
-                    ),
-                    c.Text(text=msg.content),
-                ],
-                class_name="container col-sm-4 my-4",
-            )
-            for msg in memory.chat_memory.messages
-        ),
-    ]
+    return [*(ChatMessage(msg.type, msg.content) for msg in history.messages)]
 
 
-@router.post(
-    "/api/chat/generate", response_model=FastUI, response_model_exclude_none=True
-)
+@router.post("/chat/generate", response_model=FastUI, response_model_exclude_none=True)
 async def chat_generate(user_msg: Annotated[str, Form(...)]) -> list[AnyComponent]:
     """
     Endpoint for showing the Chat Generate UI.
     """
     return [
-        c.Div(
-            components=[c.Heading(text="You", level=6), c.Text(text=user_msg)],
-            class_name="container col-sm-4 my-4",
-        ),
+        ChatMessage("human", user_msg),
         c.ServerLoad(
-            path="/chat/generate/result?user_msg=" + user_msg,
-            load_trigger=PageEvent(name="generate-result"),
+            path="/chat/generate/sse-response?user_msg=" + user_msg,
+            load_trigger=PageEvent(name="generate-response"),
             components=[c.Text(text="...")],
+            sse=True,
         ),
-        c.Form(
+        ChatInputForm(
             submit_url="/api/chat/generate",
-            display_mode="inline",
-            form_fields=[
-                c.FormFieldInput(
-                    title="",
-                    name="user_msg",
-                    placeholder="Message ChatBot...",
-                    class_name="py-4",
-                ),
-            ],
-            footer=[
-                c.FireEvent(event=PageEvent(name="generate-result")),
-            ],
+            fire_page_event="generate-response",
         ),
     ]
 
 
-@router.get(
-    "/api/chat/generate/result",
-    response_model=FastUI,
-    response_model_exclude_none=True,
-)
-async def chat_generate_result(user_msg: str) -> list[AnyComponent]:
-    """
-    Endpoint for showing the Chat Generate Result UI.
-    """
-    await chat.apredict(input=user_msg)
-    return [
-        c.Div(
-            components=[
-                c.Heading(text="ChatBot", level=6),
-                c.Text(text=memory.chat_memory.messages[-1].content),
-            ],
-            class_name="container col-sm-4 my-4",
-        ),
-    ]
+@router.get("/chat/generate/sse-response")
+async def sse_ai_response(user_msg: str) -> StreamingResponse:
+    return StreamingResponse(
+        ai_response_generator(user_msg), media_type="text/event-stream"
+    )
+
+
+async def ai_response_generator(user_msg: str) -> AsyncIterable[str]:
+    output, msg = "", ""
+    async for chunk in session.astream(user_msg):
+        output += chunk.content
+        m = FastUI(root=[ChatMessage("ai", output)])
+        yield f"data: {m.model_dump_json(by_alias=True, exclude_none=True)}\n\n"
+
+    # avoid the browser reconnecting
+    while True:
+        import asyncio
+
+        yield msg
+        await asyncio.sleep(5)
