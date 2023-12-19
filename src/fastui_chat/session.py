@@ -21,16 +21,6 @@ class ChatSession:
             history_messages_key="history",
         )
 
-    def invoke(self, user_msg: str):
-        return self.chain.invoke(
-            {"user_msg": user_msg}, config={"configurable": {"session_id": ""}}
-        )
-
-    async def ainvoke(self, user_msg: str):
-        return await self.chain.ainvoke(
-            {"user_msg": user_msg}, config={"configurable": {"session_id": ""}}
-        )
-
     async def astream(self, user_msg: str):
         async for message in self.chain.astream(
             {"user_msg": user_msg}, config={"configurable": {"session_id": ""}}
@@ -49,19 +39,3 @@ def create_basic_chat_handler(llm: BaseChatModel, system_message: str = ""):
         )
         | llm
     )
-
-
-if __name__ == "__main__":
-    from langchain.chat_models import ChatOpenAI
-    from langchain.memory import ChatMessageHistory
-
-    history = ChatMessageHistory()
-    chat_handler = create_basic_chat_handler(ChatOpenAI())
-
-    session = ChatSession(
-        chat_handler=chat_handler,
-        history=history,
-    )
-    session.invoke("Hello")
-
-    print(history.messages)
