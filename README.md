@@ -14,6 +14,8 @@ A minimalistic ChatBot Interface in pure python.
 
 ## TODO
 
+- [ ] Image IO (vision models)
+
 - [ ] Add model selection
 
 - [ ] Store previous chats
