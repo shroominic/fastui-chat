@@ -82,7 +82,6 @@ async def ai_response_generator(
 ) -> AsyncIterable[str]:
     output, msg = "", ""
     async for chunk in session.astream(user_msg):
-        print(f"{chunk=}")
         if isinstance(chunk.content, list) and isinstance(chunk.content[0], dict):
             m = FastUI(root=[ChatMessage("ai", chunk)])
         else:
