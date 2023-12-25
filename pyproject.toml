@@ -6,8 +6,8 @@ authors = [
     { name = "Shroominic", email = "contact@shroominic.com" }
 ]
 dependencies = [
+    "langchain_core>=0.1",
     "fastui[fastapi] @ git+https://github.com/pydantic/FastUI.git@main#subdirectory=src/python-fastui",
-    "langchain[openai]>=0.0.350",
     "uvicorn>=0.24.0.post1",
 ]
 readme = "README.md"
@@ -18,15 +18,16 @@ license = "MIT"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project.scripts]
-startapp = "fastui_chat.app:start"
-
 [tool.rye]
 managed = true
 dev-dependencies = [
     "mypy>=1.7.1",
     "ruff>=0.1.8",
+    "langchain[openai]>=0.0.350",
 ]
+
+[tool.rye.scripts]
+startapp = "python examples/simple_chatbot.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true
