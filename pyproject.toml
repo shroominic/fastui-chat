@@ -1,6 +1,6 @@
 [project]
 name = "fastui-chat"
-version = "0.0.1"
+version = "0.0.2"
 description = "Minimalistic chatbot ui using fastapi, fastui and langchain."
 authors = [
     { name = "Shroominic", email = "contact@shroominic.com" }
@@ -11,7 +11,7 @@ dependencies = [
     "uvicorn>=0.24.0.post1",
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.10"
 license = "MIT"
 
 [build-system]
