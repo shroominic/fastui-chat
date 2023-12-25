@@ -1,4 +1,5 @@
-from typing import AsyncGenerator, TypedDict
+from typing import AsyncGenerator
+from typing_extensions import TypedDict
 
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables import Runnable
