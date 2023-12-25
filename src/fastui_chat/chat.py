@@ -1,24 +1,17 @@
 from typing import Annotated, AsyncIterable
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Depends, Form
 from fastapi.responses import StreamingResponse
 from fastui import AnyComponent, FastUI
 from fastui import components as c
 from fastui.events import PageEvent
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
 
 from .components import ChatInputForm, ChatMessage
-from .session import ChatSession, create_basic_chat_handler
+from .db import get_history, get_session
+from .session import ChatSession
 
 router = APIRouter()
-
-history = ChatMessageHistory()
-
-session = ChatSession(
-    chat_handler=create_basic_chat_handler(ChatOpenAI()),
-    history=history,
-)
 
 
 @router.get("/", response_model=FastUI, response_model_exclude_none=True)
@@ -44,7 +37,9 @@ async def chat_ui() -> list[AnyComponent]:
 
 
 @router.get("/chat/history", response_model=FastUI, response_model_exclude_none=True)
-async def chat_history() -> list[AnyComponent]:
+async def chat_history(
+    history: Annotated[BaseChatMessageHistory, Depends(get_history)],
+) -> list[AnyComponent]:
     """
     Endpoint for showing the Chat History UI.
     """
@@ -59,7 +54,7 @@ async def chat_generate(user_msg: Annotated[str, Form(...)]) -> list[AnyComponen
     return [
         ChatMessage("human", user_msg),
         c.ServerLoad(
-            path="/chat/generate/sse-response?user_msg=" + user_msg,
+            path="/chat/generate/response?user_msg=" + user_msg,
             load_trigger=PageEvent(name="generate-response"),
             components=[c.Text(text="...")],
             sse=True,
@@ -71,14 +66,20 @@ async def chat_generate(user_msg: Annotated[str, Form(...)]) -> list[AnyComponen
     ]
 
 
-@router.get("/chat/generate/sse-response")
-async def sse_ai_response(user_msg: str) -> StreamingResponse:
+@router.get("/chat/generate/response")
+async def sse_ai_response(
+    user_msg: str,
+    session: Annotated[ChatSession, Depends(get_session)],
+) -> StreamingResponse:
     return StreamingResponse(
-        ai_response_generator(user_msg), media_type="text/event-stream"
+        ai_response_generator(user_msg, session), media_type="text/event-stream"
     )
 
 
-async def ai_response_generator(user_msg: str) -> AsyncIterable[str]:
+async def ai_response_generator(
+    user_msg: str,
+    session: ChatSession,
+) -> AsyncIterable[str]:
     output, msg = "", ""
     async for chunk in session.astream(user_msg):
         output += chunk.content
