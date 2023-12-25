@@ -1,7 +1,9 @@
+from typing import Union
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable
+from langchain_core.messages import HumanMessage, AIMessage, AIMessageChunk
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 
@@ -9,7 +11,7 @@ class ChatSession:
     def __init__(
         self,
         *,
-        chat_handler: Runnable,
+        chat_handler: Runnable[HumanMessage, Union[AIMessage, AIMessageChunk]],
         history: BaseChatMessageHistory,
     ) -> None:
         self.history = history
@@ -17,7 +19,7 @@ class ChatSession:
 
     async def astream(self, user_msg: str):
         async for message in self.chat_handler.astream(
-            {"user_msg": user_msg},
+            HumanMessage(content=user_msg),
             config={
                 "run_name": "ChatMessage",
                 "configurable": {"session_id": ""},
