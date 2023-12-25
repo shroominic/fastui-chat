@@ -45,6 +45,8 @@ app.start_with_uvicorn()
 
 ## TODO
 
+- [ ] Image IO (vision models)
+
 - [ ] Store previous chats and display them
 
 - [ ] AutoScroll to bottom of chat on new message
