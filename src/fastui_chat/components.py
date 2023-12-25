@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any, Literal, Union
 from typing_extensions import TypedDict
 
 from fastui import components as c
@@ -15,10 +15,32 @@ class ChatMessage(c.Div):
     Component for displaying a chat message.
     """
 
-    content: str
+    content: Union[str, list[Union[str, dict]]]
     msg_type: Literal["human", "ai"]
     class_name: str = "container col-sm-4 my-4"
     display_alias: DisplayAlias = {"human": "You", "ai": "ChatBot"}
+
+    @property
+    def images(self) -> list[str]:
+        """Return a list of image URLs in the message content."""
+        if isinstance(self.content, str):
+            return []
+        return [
+            item["image_url"]["url"]
+            for item in self.content
+            if isinstance(item, dict) and item["type"] == "image_url"
+        ]
+
+    @property
+    def message(self) -> str:
+        """Return the message content."""
+        return (
+            self.content
+            if isinstance(self.content, str)
+            else self.content[0]
+            if isinstance(self.content[0], str)
+            else self.content[0]["text"]
+        )
 
     def __init__(
         self,
@@ -33,7 +55,14 @@ class ChatMessage(c.Div):
         super().__init__(**data, components=[])
         self.components = [
             c.Heading(text=self.display_alias[self.msg_type], level=6),
-            c.Markdown(text=self.content),
+            c.Markdown(text=self.message),
+            *(
+                c.Image(
+                    src=image_url,
+                    class_name="img-fluid",
+                )
+                for image_url in self.images
+            ),
         ]
 
 
