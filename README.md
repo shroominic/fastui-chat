@@ -2,7 +2,38 @@
 
 A minimalistic ChatBot Interface in pure python.
 
-## How to use
+## Usage
+
+```python
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ChatMessageHistory
+
+from fastui_chat import ChatUI, basic_chat_handler
+
+history = ChatMessageHistory()
+handler = basic_chat_handler(
+    llm=ChatOpenAI(),
+    chat_history=history,
+)
+
+history.add_ai_message("How can I help you today?")
+
+app = ChatUI(
+    chat_history=history,
+    chat_handler=handler,
+)
+
+app.start_with_uvicorn()
+```
+
+## Features
+
+- Easy to use
+- Minimalistic & Lightweight
+- LangChain Compatible
+- Python Only
+
+## Development Setup
 
 ```bash
 > git clone https://github.com/shroominic/fastui-chat.git && cd fastui-chat
@@ -14,10 +45,14 @@ A minimalistic ChatBot Interface in pure python.
 
 ## TODO
 
-- [ ] Add model selection
+- [ ] Store previous chats and display them
 
-- [ ] Store previous chats
+- [ ] AutoScroll to bottom of chat on new message
 
-- [ ] Use scrollview for chat
+- [ ] Make easy to deploy
 
-- [ ] ... add more todos
+- [ ] Add tests
+
+- [ ] Add more examples
+
+- [ ] ... other ideas? Open an issue or PR!
