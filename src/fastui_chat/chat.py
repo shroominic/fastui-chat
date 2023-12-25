@@ -82,8 +82,16 @@ async def ai_response_generator(
 ) -> AsyncIterable[str]:
     output, msg = "", ""
     async for chunk in session.astream(user_msg):
-        output += chunk.content
-        m = FastUI(root=[ChatMessage("ai", output)])
+        print(f"{chunk=}")
+        if isinstance(chunk.content, list) and isinstance(chunk.content[0], dict):
+            m = FastUI(root=[ChatMessage("ai", chunk)])
+        else:
+            output += (
+                chunk.content
+                if not isinstance(chunk.content, list)
+                else chunk.content[0]
+            )
+            m = FastUI(root=[ChatMessage("ai", output)])
         yield f"data: {m.model_dump_json(by_alias=True, exclude_none=True)}\n\n"
 
     # avoid the browser reconnecting
