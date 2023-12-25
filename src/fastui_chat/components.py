@@ -45,7 +45,7 @@ class ChatMessage(c.Div):
     def __init__(
         self,
         msg_type: Literal["human", "ai"],
-        content: str,
+        content: Union[str, list[Union[str, dict]]],
         **data: Any,
     ) -> None:
         if msg_type == "AIMessageChunk":
