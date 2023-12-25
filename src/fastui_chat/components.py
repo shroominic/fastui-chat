@@ -1,4 +1,5 @@
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal
+from typing_extensions import TypedDict
 
 from fastui import components as c
 from fastui import events as e
