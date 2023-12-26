@@ -40,3 +40,6 @@ mypy_path = "src/"
 ignore_missing_imports = true
 follow_imports = "skip"
 exclude = "(fastui/.*|venv/.*|dist/.*|wheels/.*|.*egg-info)"
+
+[tool.ruff]
+select = ["E", "F", "I"]
