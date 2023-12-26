@@ -1,8 +1,8 @@
 from typing import Any, Literal, Union
-from typing_extensions import TypedDict
 
 from fastui import components as c
 from fastui import events as e
+from typing_extensions import TypedDict
 
 
 class DisplayAlias(TypedDict):

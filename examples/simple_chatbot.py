@@ -1,7 +1,6 @@
+from fastui_chat import ChatUI, basic_chat_handler
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ChatMessageHistory
-
-from fastui_chat import ChatUI, basic_chat_handler
 
 history = ChatMessageHistory()
 handler = basic_chat_handler(
