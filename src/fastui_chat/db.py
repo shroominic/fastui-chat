@@ -1,6 +1,7 @@
 from typing import AsyncGenerator
 
 from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables import Runnable
 from typing_extensions import TypedDict
 
@@ -9,7 +10,7 @@ from .session import ChatSession
 
 class FakeDatabase(TypedDict, total=False):
     chat_history: BaseChatMessageHistory
-    chat_handler: Runnable
+    chat_handler: Runnable[HumanMessage, AIMessage]
 
 
 database: FakeDatabase = {}
@@ -17,7 +18,7 @@ database: FakeDatabase = {}
 
 def init_database(
     chat_history: BaseChatMessageHistory,
-    chat_handler: Runnable,
+    chat_handler: Runnable[HumanMessage, AIMessage],
 ) -> None:
     database["chat_history"] = chat_history
     database["chat_handler"] = chat_handler
