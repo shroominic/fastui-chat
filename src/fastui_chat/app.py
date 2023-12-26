@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import FastAPI
 from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables import Runnable
 
 from .chat import router as chat_router
@@ -13,7 +14,7 @@ class ChatUI(FastAPI):
     def __init__(
         self,
         chat_history: BaseChatMessageHistory,
-        chat_handler: Runnable,
+        chat_handler: Runnable[HumanMessage, AIMessage],
         *args: Any,
         **kwargs: Any,
     ) -> None:
