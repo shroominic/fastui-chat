@@ -42,9 +42,11 @@ def basic_chat_handler(
         )
         | llm
     )
-    return RunnableWithMessageHistory(
+    return {
+        "user_msg": lambda x: x.content,
+    } | RunnableWithMessageHistory(
         handler,
-        lambda session_id: chat_history,
+        lambda _: chat_history,
         input_messages_key="user_msg",
         history_messages_key="history",
     )
