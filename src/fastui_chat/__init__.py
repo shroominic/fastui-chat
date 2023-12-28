@@ -5,6 +5,3 @@ __all__ = [
     "ChatUI",
     "basic_chat_handler",
 ]
-
-# MaybeTODO: Indipendent ChatComponent (FastUI Component)
-# to be used by eg Flask or Django or other frameworks

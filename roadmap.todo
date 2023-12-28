@@ -1,0 +1,13 @@
+- [ ] (maybe) Indipendent ChatComponent (FastUI Component)
+
+- [ ] Image IO (vision models)
+
+- [ ] Store previous chats and display them
+
+- [ ] AutoScroll to bottom of chat on new message
+
+- [ ] Make easy to deploy
+
+- [ ] Add tests
+
+- [ ] Add more examples
