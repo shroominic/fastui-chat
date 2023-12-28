@@ -23,7 +23,8 @@ managed = true
 dev-dependencies = [
     "mypy>=1.7.1",
     "ruff>=0.1.8",
-    "langchain[openai]>=0.0.350",
+    "langchain[openai] >= 0.0.352",
+    "langchain_community @ git+https://github.com/langchain-ai/langchain.git@master#subdirectory=libs/community",
 ]
 
 [tool.rye.scripts]
