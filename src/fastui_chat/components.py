@@ -26,7 +26,11 @@ class ChatMessage(c.Div):
         if isinstance(self.content, str):
             return []
         return [
-            item["image_url"]["url"]
+            (
+                item["image_url"]["url"]
+                if isinstance(item["image_url"], dict)
+                else item["image_url"]
+            )
             for item in self.content
             if isinstance(item, dict) and item["type"] == "image_url"
         ]
