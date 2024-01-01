@@ -1,8 +1,13 @@
 # fastui-chat
 
 A minimalistic ChatBot Interface in pure python.
+Build on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core](https://github.com/langchain-ai/langchain).
 
 ## Usage
+
+```bash
+> pip install fastui-chat
+```
 
 ```python
 from langchain.chat_models import ChatOpenAI
