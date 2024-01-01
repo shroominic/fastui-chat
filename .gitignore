@@ -13,4 +13,3 @@ tree.yaml
 
 # rye 
 .python-version
-requirements-dev.lock

@@ -28,7 +28,7 @@ then
         echo "Installing via pip now ..."
         python3 -m venv .venv
         source .venv/bin/activate
-        pip install -r requirements.lock
+        pip install -r requirements-dev.lock
         pip install -e .
 
     else
@@ -42,4 +42,4 @@ fi
 echo "SETUP: install pre-commit hooks"
 pre-commit install
 
-echo "Try running 'python example/simple_chatbot.py' to test your setup"
+echo "Try running 'python examples/simple_chatbot.py' to test your setup"
