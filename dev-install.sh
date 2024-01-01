@@ -26,11 +26,15 @@ then
     elif [ "$install_method" = "pip" ]
     then
         echo "Installing via pip now ..."
-        python3 -m venv .venv
-        source .venv/bin/activate
-        pip install -r requirements-dev.lock
-        pip install -e .
-
+        if command -v python &> /dev/null
+        then
+            python -m venv .venv
+        else
+            python3 -m venv .venv
+        fi
+        .venv/bin/python -m pip install -e .
+        .venv/bin/python -m pip install -r requirements-dev.lock
+        echo "Run 'source .venv/bin/activate' to activate the virtual environment"
     else
         echo "Invalid option. Please run the script again and enter 'rye' or 'pip'."
         exit 1
@@ -39,7 +43,4 @@ then
     clear
 fi
 
-echo "SETUP: install pre-commit hooks"
-pre-commit install
-
-echo "Try running 'python examples/simple_chatbot.py' to test your setup"
+echo "Try 'python examples/simple_chatbot.py' to test your setup."
