@@ -6,7 +6,7 @@ Build on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core
 ## Usage
 
 ```bash
-> pip install fastui-chat
+pip install fastui-chat
 ```
 
 ```python
