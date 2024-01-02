@@ -18,10 +18,10 @@ then
         echo "SYNC: setup .venv"
         rye sync
 
-        echo "ACTIVATE: activate .venv"
-        rye shell
-
         clear
+
+        echo "Run `source \"$HOME/.rye/env\"` and then `rye shell` to activate the virtual environment"
+
 
     elif [ "$install_method" = "pip" ]
     then
@@ -34,13 +34,14 @@ then
         fi
         .venv/bin/python -m pip install -e .
         .venv/bin/python -m pip install -r requirements-dev.lock
+        
+        clear
+        
         echo "Run 'source .venv/bin/activate' to activate the virtual environment"
     else
         echo "Invalid option. Please run the script again and enter 'rye' or 'pip'."
         exit 1
     fi
-
-    clear
 fi
 
 echo "Try 'python examples/simple_chatbot.py' to test your setup."
