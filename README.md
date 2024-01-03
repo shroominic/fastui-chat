@@ -1,11 +1,11 @@
 # fastui-chat
 
 [![Version](https://badge.fury.io/py/fastui-chat.svg)](https://badge.fury.io/py/fastui-chat)
-![PyVersion](https://img.shields.io/pypi/pyversions/fastui-chat)
 ![Downloads](https://img.shields.io/pypi/dm/fastui-chat)
+![PyVersion](https://img.shields.io/pypi/pyversions/fastui-chat)
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
-[![Twitter Follow](https://img.shields.io/twitter/follow/shroominic?style=social)](https://x.com/shroominic)
 [![license](https://img.shields.io/github/license/shroominic/fastui-chat.svg)](https://github.com/shroominic/fastui-chat/blob/main/LICENSE)
+[![Twitter Follow](https://img.shields.io/twitter/follow/shroominic?style=social)](https://x.com/shroominic)
 
 A minimalistic ChatBot Interface in pure python. </br>
 Build on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core](https://github.com/langchain-ai/langchain).
