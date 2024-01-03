@@ -6,7 +6,7 @@ Build on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core
 ## Usage
 
 ```bash
-> pip install fastui-chat
+pip install fastui-chat
 ```
 
 ```python
@@ -41,9 +41,9 @@ app.start_with_uvicorn()
 ## Development Setup
 
 ```bash
-> git clone https://github.com/shroominic/fastui-chat.git && cd fastui-chat
+git clone https://github.com/shroominic/fastui-chat.git && cd fastui-chat
 
-> ./dev-install.sh
+./dev-install.sh
 ```
 
 ## TODO
