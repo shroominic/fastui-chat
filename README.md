@@ -2,8 +2,6 @@
 
 [![Version](https://badge.fury.io/py/fastui-chat.svg)](https://badge.fury.io/py/fastui-chat)
 ![Downloads](https://img.shields.io/pypi/dm/fastui-chat)
-![PyVersion](https://img.shields.io/pypi/pyversions/fastui-chat)
-[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
 [![license](https://img.shields.io/github/license/shroominic/fastui-chat.svg)](https://github.com/shroominic/fastui-chat/blob/main/LICENSE)
 [![Twitter Follow](https://img.shields.io/twitter/follow/shroominic?style=social)](https://x.com/shroominic)
 
