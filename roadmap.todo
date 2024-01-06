@@ -14,4 +14,4 @@
 
 - [ ] support external stream renderers
 
-- [ ] add simple terraform deploy script for aws/azure
+- [ ] add simple terraform deploy script
