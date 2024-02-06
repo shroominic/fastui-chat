@@ -33,10 +33,6 @@ async def stream_response_generator(
             m = FastUI(root=[ChatMessage("ai", output)])
         yield f"data: {m.model_dump_json(by_alias=True, exclude_none=True)}\n\n"
 
-    if output:
-        # todo img compatability
-        session.history.add_ai_message(output)
-
     # avoid the browser reconnecting
     while True:
         yield msg
@@ -64,7 +60,7 @@ class ChatAPIRouter(APIRouter):
                         c.Text(text="Welcome to the Chat UI!"),
                         c.Button(
                             text="New Chat",
-                            on_click=GoToEvent(url=f"/{uuid4().hex}"),
+                            on_click=GoToEvent(url=f"/chat/{uuid4().hex}"),
                             class_name="btn btn-primary col-lg-2 mx-3 my-2",
                         ),
                     ],
@@ -73,7 +69,9 @@ class ChatAPIRouter(APIRouter):
             ]
 
         @self.get(
-            "/{session_id}", response_model=FastUI, response_model_exclude_none=True
+            "/chat/{session_id}",
+            response_model=FastUI,
+            response_model_exclude_none=True,
         )
         async def chat_ui(
             session_id: Annotated[str, Path(title="The ChatHistory SessionID.")],
@@ -85,20 +83,21 @@ class ChatAPIRouter(APIRouter):
                 c.Page(
                     components=[
                         c.ServerLoad(
-                            path="/chat/history/" + session_id,
+                            path=f"/chat/{session_id}/history",
                             load_trigger=PageEvent(name="chat-load"),
                             components=[],
                         ),
                         ChatInputForm(
-                            submit_url=f"/api/chat/generate/{session_id}",
+                            submit_url=f"/api/chat/{session_id}/generate",
                             fire_page_event="chat-load",
                         ),
                     ],
+                    class_name="fixed-bottom row justify-content-center row-cols-lg-2",
                 )
             ]
 
         @self.get(
-            "/chat/history/{session_id}",
+            "/chat/{session_id}/history",
             response_model=FastUI,
             response_model_exclude_none=True,
         )
@@ -108,13 +107,16 @@ class ChatAPIRouter(APIRouter):
             """
             Endpoint for showing the Chat History UI.
             """
-            return [
-                ChatMessage(msg.type, msg.content)
-                for msg in chat_session.history.messages
-            ]
+            return c.Div(
+                class_name="mx-3",
+                components=[
+                    ChatMessage(msg.type, msg.content)
+                    for msg in chat_session.history.messages
+                ],
+            )
 
         @self.post(
-            "/chat/generate/{session_id}",
+            "/chat/{session_id}/generate",
             response_model=FastUI,
             response_model_exclude_none=True,
         )
@@ -128,23 +130,22 @@ class ChatAPIRouter(APIRouter):
             return [
                 ChatMessage("human", user_msg),
                 c.ServerLoad(
-                    path=f"/chat/generate/response/{session_id}?user_msg={user_msg}",
+                    path=f"/chat/{session_id}/generate/response?user_msg={user_msg}",
                     load_trigger=PageEvent(name="generate-response"),
                     components=[c.Text(text="...")],
                     sse=True,
                 ),
                 ChatInputForm(
-                    submit_url="/api/chat/generate/" + session_id,
+                    submit_url=f"/api/chat/{session_id}/generate",
                     fire_page_event="generate-response",
                 ),
             ]
 
-        @self.get("/chat/generate/response/{session_id}")
+        @self.get("/chat/{session_id}/generate/response")
         async def chat_generate_response(
             user_msg: str,
             session: Annotated[ChatSession, Depends(self.get_chat_session)],
         ) -> StreamingResponse:
-            session.history.add_message(HumanMessage(content=user_msg))
             return StreamingResponse(
                 stream_response_generator(user_msg, session),
                 media_type="text/event-stream",
