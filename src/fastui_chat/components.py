@@ -17,7 +17,7 @@ class ChatMessage(c.Div):
 
     content: Union[str, list[Union[str, dict]]]
     msg_type: Literal["human", "ai"]
-    class_name: str = "container col-sm-4 my-4"
+    class_name: str = "container mx-3 ms-1"
     display_alias: DisplayAlias = {"human": "You", "ai": "ChatBot"}
 
     @property
@@ -77,7 +77,7 @@ class ChatInputForm(c.Form):
 
     fire_page_event: str
     display_mode: str = "inline"
-    class_name: str = "row row-cols-lg-3 justify-content-center"
+    class_name: str = "row"
     form_fields: list[c.FormFieldInput] = [
         c.FormFieldInput(
             title="",
