@@ -27,7 +27,7 @@ class ChatUI(FastAPI):
             chat_history_backend or InMemoryChatMessageHistory
         )
         self.chat_handler = chat_handler or chat_handle_creator(
-            llm=ChatOpenAI, get_session_history=self.history_getter
+            llm=ChatOpenAI(), get_session_history=self.history_getter
         )
         self.include_router(
             ChatAPIRouter(
