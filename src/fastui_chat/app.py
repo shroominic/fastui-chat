@@ -1,9 +1,7 @@
-from typing import Any, Callable
+from typing import Any
 
 from fastapi import FastAPI
 from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.runnables import Runnable
 
 # todo rm langchain_openai import
 from langchain_openai.chat_models import ChatOpenAI
@@ -12,22 +10,24 @@ from .chat import ChatAPIRouter
 from .fastui_core import router as core_router
 from .history_factories import InMemoryChatMessageHistory, init_history_callable
 from .session import basic_chat_handler as chat_handle_creator
+from .types import ChatHandler, HistoryGetter
 
 
 class ChatUI(FastAPI):
     def __init__(
         self,
-        chat_history_backend: type[BaseChatMessageHistory] | None = None,
-        chat_handler: Callable[..., Runnable[HumanMessage, AIMessage]] | None = None,
+        chat_handler: ChatHandler | None = None,
+        history_backend: type[BaseChatMessageHistory] | None = None,
+        history_backend_kwargs: dict[str, Any] = {},
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.history_getter = init_history_callable(
-            chat_history_backend or InMemoryChatMessageHistory
+        self.history_getter: HistoryGetter = init_history_callable(
+            history_backend or InMemoryChatMessageHistory, history_backend_kwargs
         )
         self.chat_handler = chat_handler or chat_handle_creator(
-            llm=ChatOpenAI(), get_session_history=self.history_getter
+            llm=ChatOpenAI(), history_getter=self.history_getter
         )
         self.include_router(
             ChatAPIRouter(
