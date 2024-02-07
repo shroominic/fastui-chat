@@ -6,6 +6,9 @@ dist/
 wheels/
 *.egg-info
 
+# llms
+.models
+
 # venv
 .venv
 .env
