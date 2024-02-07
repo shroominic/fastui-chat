@@ -1,17 +1,13 @@
-- [ ] (maybe) Indipendent ChatComponent (FastUI Component)
+- [ ] image IO (vision models)
 
-- [ ] Image IO (vision models)
+- [ ] list previous chats
 
-- [ ] Store previous chats and display them
+- [ ] make chat scrollable
 
-- [ ] AutoScroll to bottom of chat on new message
-
-- [ ] Make easy to deploy
-
-- [ ] Add tests
-
-- [ ] Add more examples
+- [ ] add tests
 
 - [ ] support external stream renderers
 
 - [ ] add simple terraform deploy script
+
+- 
