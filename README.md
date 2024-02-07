@@ -51,18 +51,6 @@ git clone https://github.com/shroominic/fastui-chat.git && cd fastui-chat
 ./dev-install.sh
 ```
 
-## TODO
+## Roadmap
 
-- [ ] Image IO (vision models)
-
-- [ ] Store previous chats and display them
-
-- [ ] AutoScroll to bottom of chat on new message
-
-- [ ] Make easy to deploy
-
-- [ ] Add tests
-
-- [ ] Add more examples
-
-- [ ] ... other ideas? Open an issue or PR!
+If you want to contribute or see whats coming soon checkout the `roadmap.todo` file for open todos.
