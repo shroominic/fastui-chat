@@ -1,9 +1,12 @@
+from typing import Annotated, AsyncGenerator, Callable
+
+from fastapi import Path
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-from .history_factories import InMemoryChatMessageHistory, init_history_callable
+from .history import InMemoryChatMessageHistory, init_history_callable
 from .types import ChatHandler, HistoryGetter
 
 
@@ -54,3 +57,23 @@ def basic_chat_handler(
         input_messages_key="user_msg",
         history_messages_key="history",
     )
+
+
+def create_get_chat_session_dependency(
+    history_getter: HistoryGetter,
+    chat_handler: ChatHandler,
+) -> Callable[[str], AsyncGenerator[ChatSession, None]]:
+    """
+    Create a dependency that returns a chat session.
+    """
+
+    async def get_chat_session(
+        session_id: Annotated[str, Path(title="The ChatHistory SessionID.")],
+    ) -> AsyncGenerator[ChatSession, None]:
+        yield ChatSession(
+            session_id=session_id,
+            chat_handler=chat_handler,
+            history_getter=history_getter,
+        )
+
+    return get_chat_session
