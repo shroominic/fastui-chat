@@ -1,5 +1,5 @@
 from asyncio import sleep as asleep
-from typing import Annotated, AsyncIterable, Callable
+from typing import Annotated, AsyncIterable
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Form, Path
@@ -7,13 +7,11 @@ from fastapi.responses import StreamingResponse
 from fastui import AnyComponent, FastUI
 from fastui import components as c
 from fastui.events import GoToEvent, PageEvent
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.runnables import Runnable
 
 from .components import ChatInputForm, ChatMessage
 from .history_factories import create_get_chat_session_dependency
 from .session import ChatSession
+from .types import ChatHandler, HistoryGetter
 
 
 async def stream_response_generator(
@@ -42,8 +40,8 @@ async def stream_response_generator(
 class ChatAPIRouter(APIRouter):
     def __init__(
         self,
-        history_getter: Callable[..., BaseChatMessageHistory],
-        chat_handler: Runnable[HumanMessage, AIMessage],
+        history_getter: HistoryGetter,
+        chat_handler: ChatHandler,
         *args,
         **kwargs,
     ) -> None:
@@ -52,7 +50,7 @@ class ChatAPIRouter(APIRouter):
             history_getter, chat_handler
         )
 
-        @self.get("/", response_model=FastUI, response_model_exclude_none=True)
+        @self.get("/chat", response_model=FastUI, response_model_exclude_none=True)
         async def index() -> list[AnyComponent]:
             return [
                 c.Page(
