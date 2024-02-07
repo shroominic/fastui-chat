@@ -49,8 +49,17 @@ class ChatAPIRouter(APIRouter):
             history_getter, chat_handler
         )
 
-        @self.get("/chat", response_model=FastUI, response_model_exclude_none=True)
+        @self.get("/")
         async def index() -> list[AnyComponent]:
+            """redirect to new chat"""
+            return [
+                c.FireEvent(
+                    event=GoToEvent(url="/chat"),
+                )
+            ]
+
+        @self.get("/chat", response_model=FastUI, response_model_exclude_none=True)
+        async def new_chat() -> list[AnyComponent]:
             return [
                 c.Page(
                     components=[
