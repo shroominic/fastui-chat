@@ -1,5 +1,8 @@
+from funcchain.syntax.components.handler import (
+    create_chat_handler as basic_chat_handler,
+)
+
 from .app import ChatUI
-from .session import basic_chat_handler
 
 __all__ = [
     "ChatUI",
