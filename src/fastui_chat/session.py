@@ -1,11 +1,10 @@
-from typing import Callable
-
-from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import Runnable
 from langchain_core.runnables.history import RunnableWithMessageHistory
+
+from .history_factories import InMemoryChatMessageHistory, init_history_callable
+from .types import ChatHandler, HistoryGetter
 
 
 class ChatSession:
@@ -13,8 +12,8 @@ class ChatSession:
         self,
         *,
         session_id: str,
-        chat_handler: Runnable[HumanMessage, AIMessage],
-        history_getter: Callable[..., BaseChatMessageHistory],
+        chat_handler: ChatHandler,
+        history_getter: HistoryGetter,
     ) -> None:
         self.session_id = session_id
         self.history = history_getter(session_id)
@@ -33,9 +32,10 @@ class ChatSession:
 
 def basic_chat_handler(
     llm: BaseChatModel,
-    get_session_history: Callable[..., BaseChatMessageHistory],
+    history_getter: HistoryGetter | None = None,
     system_message: str = "",
-) -> Runnable[HumanMessage, AIMessage]:
+) -> ChatHandler:
+    history_getter = history_getter or init_history_callable(InMemoryChatMessageHistory)
     handler = (
         ChatPromptTemplate.from_messages(
             [
@@ -50,7 +50,7 @@ def basic_chat_handler(
         "user_msg": lambda x: x.content,
     } | RunnableWithMessageHistory(
         handler,
-        get_session_history=get_session_history,
+        get_session_history=history_getter,
         input_messages_key="user_msg",
         history_messages_key="history",
     )
