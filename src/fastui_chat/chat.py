@@ -9,8 +9,7 @@ from fastui import components as c
 from fastui.events import GoToEvent, PageEvent
 
 from .components import ChatInputForm, ChatMessage
-from .history_factories import create_get_chat_session_dependency
-from .session import ChatSession
+from .session import ChatSession, create_get_chat_session_dependency
 from .types import ChatHandler, HistoryGetter
 
 
