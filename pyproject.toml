@@ -25,7 +25,13 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = ["mypy>=1.7.1", "ruff>=0.1.8", "python-dotenv>=1"]
+dev-dependencies = [
+    "mypy>=1.7.1",
+    "ruff>=0.1.8",
+    "python-dotenv>=1",
+    "redis>=5.0.1",
+    "langchain_community",
+]
 
 [tool.rye.scripts]
 startapp = "python examples/simple_chatbot.py"
