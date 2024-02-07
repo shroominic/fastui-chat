@@ -1,12 +1,12 @@
-from typing import Annotated, AsyncGenerator, Awaitable, Callable
+from typing import Annotated, Any, AsyncGenerator, Callable
 
 from fastapi import Path
 from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.runnables import Runnable
+from langchain_core.messages import BaseMessage
 from rich import print
 
 from .session import ChatSession
+from .types import ChatHandler, HistoryGetter
 
 _in_memory_database: dict[str, list[BaseMessage]] = {}
 
@@ -41,33 +41,22 @@ class InMemoryChatMessageHistory(BaseChatMessageHistory):
 
 def init_history_callable(
     backend: type[BaseChatMessageHistory],
-) -> Callable[..., BaseChatMessageHistory]:
+    backend_kwargs: dict[str, Any] = {},
+) -> HistoryGetter:
     """
     Create a function that returns a chat history.
     """
 
-    def history_getter(session_id: str) -> BaseChatMessageHistory:
-        return backend(session_id)
+    def history_getter(session_id: str, **kwargs: Any) -> BaseChatMessageHistory:
+        kwargs.update(backend_kwargs)
+        return backend(session_id, **kwargs)
 
     return history_getter
 
 
-def init_chat_handler_callable(
-    handlers: dict[str, Callable[..., Awaitable[ChatSession]]],
-) -> Callable[..., Awaitable[ChatSession]]:
-    """
-    Create a function that returns a chat handler.
-    """
-
-    async def chat_handler_getter(key: str = "default") -> ChatSession:
-        return await handlers[key]()
-
-    return chat_handler_getter
-
-
 def create_get_chat_session_dependency(
-    history_getter: Callable[..., BaseChatMessageHistory],
-    chat_handler: Runnable[HumanMessage, AIMessage],
+    history_getter: HistoryGetter,
+    chat_handler: ChatHandler,
 ) -> Callable[[str], AsyncGenerator[ChatSession, None]]:
     """
     Create a dependency that returns a chat session.
