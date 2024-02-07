@@ -7,8 +7,8 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_openai.chat_models import ChatOpenAI
 
 from .chat import ChatAPIRouter
-from .fastui_core import router as core_router
-from .history_factories import InMemoryChatMessageHistory, init_history_callable
+from .history import InMemoryChatMessageHistory, init_history_callable
+from .runtime import router as core_router
 from .session import basic_chat_handler as chat_handle_creator
 from .types import ChatHandler, HistoryGetter
 
