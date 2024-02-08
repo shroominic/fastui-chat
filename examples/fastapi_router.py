@@ -7,7 +7,9 @@ from funcchain.utils.memory import InMemoryChatMessageHistory, create_history_fa
 app = FastAPI()
 
 history_getter = create_history_factory(InMemoryChatMessageHistory)
-chat_handler = create_chat_handler(llm="gpt-4", history_getter=history_getter)
+chat_handler = create_chat_handler(
+    llm="ollama/open-hermes2", history_factory=history_getter
+)
 
 app.include_router(
     ChatAPIRouter(history_getter, chat_handler),
