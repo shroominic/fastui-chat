@@ -1,4 +1,4 @@
-from typing import Annotated, AsyncGenerator, AsyncIterator, Callable
+from typing import Annotated, AsyncGenerator, AsyncIterator, Callable, Iterator
 
 from fastapi import Path
 from funcchain.schema.types import ChatHandler, ChatHistoryFactory
@@ -33,7 +33,7 @@ class ChatSession:  # RunnableBindingBase?
     async def ainvoke(self, msg: HumanMessage) -> AIMessage:
         return await self.chat_handler.ainvoke(msg, self.config)
 
-    def stream(self, msg: HumanMessage) -> AsyncIterator[AIMessageChunk]:
+    def stream(self, msg: HumanMessage) -> Iterator[AIMessageChunk]:
         yield from self.chat_handler.stream(msg, self.config)
 
     async def astream(self, msg: HumanMessage) -> AsyncIterator[AIMessageChunk]:
