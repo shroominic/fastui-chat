@@ -1,12 +1,14 @@
-from typing import Annotated, AsyncGenerator, AsyncIterator, Callable, Iterator
+from typing import Annotated, AsyncGenerator, Callable
 
 from fastapi import Path
 from funcchain.schema.types import ChatHandler, ChatHistoryFactory
-from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
-from langchain_core.runnables import RunnableConfig
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.base import RunnableBindingBase
 
 
-class ChatSession:  # RunnableBindingBase?
+class ChatSession(RunnableBindingBase):
+    history: BaseChatMessageHistory
+
     def __init__(
         self,
         *,
@@ -14,31 +16,16 @@ class ChatSession:  # RunnableBindingBase?
         chat_handler: ChatHandler,
         history_getter: ChatHistoryFactory,
     ) -> None:
-        self.session_id = session_id
-        self.history = history_getter(session_id)
-        self.chat_handler = chat_handler  # maybe make this chat_handler_getter
-
-    @property
-    def config(self) -> RunnableConfig:
-        return {
-            "run_name": "ChatMessage",
-            "configurable": {
-                "session_id": self.session_id,
+        super().__init__(
+            bound=chat_handler,
+            config={
+                "run_name": "ChatMessage",
+                "configurable": {
+                    "session_id": session_id,
+                },
             },
-        }
-
-    def invoke(self, msg: HumanMessage) -> AIMessage:
-        return self.chat_handler.invoke(msg, self.config)
-
-    async def ainvoke(self, msg: HumanMessage) -> AIMessage:
-        return await self.chat_handler.ainvoke(msg, self.config)
-
-    def stream(self, msg: HumanMessage) -> Iterator[AIMessageChunk]:
-        yield from self.chat_handler.stream(msg, self.config)
-
-    async def astream(self, msg: HumanMessage) -> AsyncIterator[AIMessageChunk]:
-        async for chunk in self.chat_handler.astream(msg, self.config):
-            yield chunk
+            history=history_getter(session_id),
+        )
 
 
 def create_get_chat_session_dependency(
