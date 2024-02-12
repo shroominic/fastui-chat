@@ -1,8 +1,11 @@
 from fastapi import FastAPI
+from fastui_chat import (
+    InMemoryChatMessageHistory,
+    create_chat_handler,
+    create_history_factory,
+)
 from fastui_chat.chat import ChatAPIRouter
 from fastui_chat.runtime import router as fastui_runtime
-from funcchain.syntax.components.handler import create_chat_handler
-from funcchain.utils.memory import InMemoryChatMessageHistory, create_history_factory
 
 app = FastAPI()
 
