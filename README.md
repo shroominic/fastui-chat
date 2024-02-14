@@ -15,33 +15,70 @@ pip install fastui-chat
 ```
 
 ```python
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ChatMessageHistory
+from fastui_chat import ChatUI
 
-from fastui_chat import ChatUI, basic_chat_handler
+# chatui inherits from FastAPI so you can use it as a FastAPI app
+app = ChatUI()
 
-history = ChatMessageHistory()
-handler = basic_chat_handler(
-    llm=ChatOpenAI(),
-    chat_history=history,
+# Run with:
+# uvicorn examples.minimal:app
+
+# for hot reloading:
+# uvicorn examples.minimal:app --reload
+
+# or use the built-in method
+if __name__ == "__main__":
+    app.start_with_uvicorn()
+```
+
+## Extend FastAPI
+
+You can also only use the router and extend your existing FastAPI app.
+
+```python
+from fastapi import FastAPI
+from fastui_chat import create_chat_handler, create_history_factory
+from fastui_chat.chat import ChatAPIRouter
+from fastui_chat.history import InMemoryChatMessageHistory
+from fastui_chat.runtime import router as fastui_runtime
+
+# callable that returns a ChatMessageHistory given a session_id
+history_factory = create_history_factory(
+    # swap out with any from langchain_community.chat_message_histories
+    InMemoryChatMessageHistory,
 )
 
-history.add_ai_message("How can I help you today?")
-
-app = ChatUI(
-    chat_history=history,
-    chat_handler=handler,
+# a chat handler generates an AIMessage based on a given HumanMessage and ChatHistory
+chat_handler = create_chat_handler(
+    llm="openai/gpt-4-turbo-preview",
+    history_factory=history_factory,
 )
 
-app.start_with_uvicorn()
+# setup your fastapi app
+app = FastAPI()
+
+# add the chatui router to your app
+app.include_router(
+    ChatAPIRouter(history_factory, chat_handler),
+    prefix="/api",
+)
+
+# make sure to add the runtime router as latest since it has a catch-all route
+app.include_router(fastui_runtime)
+
+# start the server with `uvicorn examples.fastapi_router:app`
 ```
 
 ## Features
 
+- Python Only
 - Easy to use
 - Minimalistic & Lightweight
 - LangChain Compatible
-- Python Only
+- FastAPI Compatible
+- Parallel Chat Sessions
+- Switchable ChatHistory Backends
+- Insert your custom chat handler
 
 ## Development Setup
 
