@@ -12,6 +12,7 @@ wheels/
 # venv
 .venv
 .env
+.models
 tree.yaml
 
 # rye 
