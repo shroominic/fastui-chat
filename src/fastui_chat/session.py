@@ -1,66 +1,35 @@
 from typing import Annotated, AsyncGenerator, Callable
 
 from fastapi import Path
-from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables.history import RunnableWithMessageHistory
-
-from .history import InMemoryChatMessageHistory, init_history_callable
-from .types import ChatHandler, HistoryGetter
+from funcchain.schema.types import ChatHandler, ChatHistoryFactory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.base import RunnableBindingBase
 
 
-class ChatSession:
+class ChatSession(RunnableBindingBase):
+    history: BaseChatMessageHistory
+
     def __init__(
         self,
         *,
         session_id: str,
         chat_handler: ChatHandler,
-        history_getter: HistoryGetter,
+        history_getter: ChatHistoryFactory,
     ) -> None:
-        self.session_id = session_id
-        self.history = history_getter(session_id)
-        self.chat_handler = chat_handler  # maybe make this chat_handler_getter
-
-    async def astream(self, user_msg: str):
-        async for message in self.chat_handler.astream(
-            HumanMessage(content=user_msg),
+        super().__init__(
+            bound=chat_handler,
             config={
                 "run_name": "ChatMessage",
-                "configurable": {"session_id": self.session_id},
+                "configurable": {
+                    "session_id": session_id,
+                },
             },
-        ):
-            yield message
-
-
-def basic_chat_handler(
-    llm: BaseChatModel,
-    history_getter: HistoryGetter | None = None,
-    system_message: str = "",
-) -> ChatHandler:
-    history_getter = history_getter or init_history_callable(InMemoryChatMessageHistory)
-    handler = (
-        ChatPromptTemplate.from_messages(
-            [
-                *(("system", system_message) if system_message else []),
-                MessagesPlaceholder(variable_name="history"),
-                ("human", "{user_msg}"),
-            ]
+            history=history_getter(session_id),
         )
-        | llm
-    )
-    return {
-        "user_msg": lambda x: x.content,
-    } | RunnableWithMessageHistory(
-        handler,
-        get_session_history=history_getter,
-        input_messages_key="user_msg",
-        history_messages_key="history",
-    )
 
 
 def create_get_chat_session_dependency(
-    history_getter: HistoryGetter,
+    history_getter: ChatHistoryFactory,
     chat_handler: ChatHandler,
 ) -> Callable[[str], AsyncGenerator[ChatSession, None]]:
     """

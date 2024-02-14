@@ -7,14 +7,15 @@ from fastapi.responses import StreamingResponse
 from fastui import AnyComponent, FastUI
 from fastui import components as c
 from fastui.events import GoToEvent, PageEvent
+from funcchain.schema.types import ChatHandler, ChatHistoryFactory
+from langchain_core.messages import HumanMessage
 
 from .components import ChatInputForm, ChatMessage
 from .session import ChatSession, create_get_chat_session_dependency
-from .types import ChatHandler, HistoryGetter
 
 
 async def stream_response_generator(
-    user_msg: str,
+    user_msg: HumanMessage,
     session: ChatSession,
 ) -> AsyncIterable[str]:
     output, msg = "", ""
@@ -39,7 +40,7 @@ async def stream_response_generator(
 class ChatAPIRouter(APIRouter):
     def __init__(
         self,
-        history_getter: HistoryGetter,
+        history_getter: ChatHistoryFactory,
         chat_handler: ChatHandler,
         *args,
         **kwargs,
@@ -152,7 +153,8 @@ class ChatAPIRouter(APIRouter):
             user_msg: str,
             session: Annotated[ChatSession, Depends(self.get_chat_session)],
         ) -> StreamingResponse:
+            msg = HumanMessage(content=user_msg)
             return StreamingResponse(
-                stream_response_generator(user_msg, session),
+                stream_response_generator(msg, session),
                 media_type="text/event-stream",
             )

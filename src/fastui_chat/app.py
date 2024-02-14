@@ -1,16 +1,13 @@
 from typing import Any
 
 from fastapi import FastAPI
+from funcchain.schema.types import ChatHandler, ChatHistoryFactory
+from funcchain.syntax.components.handler import create_chat_handler
+from funcchain.utils.memory import InMemoryChatMessageHistory, create_history_factory
 from langchain_core.chat_history import BaseChatMessageHistory
 
-# todo rm langchain_openai import
-from langchain_openai.chat_models import ChatOpenAI
-
 from .chat import ChatAPIRouter
-from .history import InMemoryChatMessageHistory, init_history_callable
 from .runtime import router as core_router
-from .session import basic_chat_handler as chat_handle_creator
-from .types import ChatHandler, HistoryGetter
 
 
 class ChatUI(FastAPI):
@@ -23,15 +20,18 @@ class ChatUI(FastAPI):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.history_getter: HistoryGetter = init_history_callable(
-            history_backend or InMemoryChatMessageHistory, history_backend_kwargs
+        self.history_getter: ChatHistoryFactory = create_history_factory(
+            history_backend or InMemoryChatMessageHistory,
+            history_backend_kwargs,
         )
-        self.chat_handler = chat_handler or chat_handle_creator(
-            llm=ChatOpenAI(), history_getter=self.history_getter
+        self.chat_handler = chat_handler or create_chat_handler(
+            llm="gpt-4-0125-preview",
+            history_getter=self.history_getter,
         )
         self.include_router(
             ChatAPIRouter(
-                history_getter=self.history_getter, chat_handler=self.chat_handler
+                history_getter=self.history_getter,
+                chat_handler=self.chat_handler,
             ),
             prefix="/api",
         )
