@@ -3,7 +3,7 @@ name = "fastui-chat"
 version = "0.3.0"
 description = "Minimalistic chatbot ui using fastapi, fastui and langchain."
 authors = [{ name = "Shroominic", email = "contact@shroominic.com" }]
-dependencies = ["funcchain>=0.2", "fastui[fastapi]>=0.4", "uvicorn>=0.25"]
+dependencies = ["funcchain>=0.2.2", "fastui[fastapi]>=0.4", "uvicorn>=0.25"]
 readme = "README.md"
 requires-python = ">= 3.10"
 license = "MIT"
