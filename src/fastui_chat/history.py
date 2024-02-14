@@ -1,5 +1,3 @@
-from funcchain.utils.memory import InMemoryChatMessageHistory
-
-__all__ = [
-    "InMemoryChatMessageHistory",
-]
+from funcchain.utils.memory import (
+    InMemoryChatMessageHistory as InMemoryChatMessageHistory,
+)
