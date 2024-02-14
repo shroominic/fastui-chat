@@ -3,7 +3,7 @@ from funcchain.syntax.components.handler import create_chat_handler
 from funcchain.syntax.components.handler import (
     create_chat_handler as basic_chat_handler,
 )
-from funcchain.utils.memory import InMemoryChatMessageHistory, create_history_factory
+from funcchain.utils.memory import create_history_factory
 
 from .app import ChatUI
 
