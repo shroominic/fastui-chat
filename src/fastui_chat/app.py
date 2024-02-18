@@ -20,17 +20,17 @@ class ChatUI(FastAPI):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.history_getter: ChatHistoryFactory = create_history_factory(
+        self.history_factory: ChatHistoryFactory = create_history_factory(
             history_backend or InMemoryChatMessageHistory,
             history_backend_kwargs,
         )
         self.chat_handler = chat_handler or create_chat_handler(
             llm="gpt-4-0125-preview",
-            history_getter=self.history_getter,
+            history_factory=self.history_factory,
         )
         self.include_router(
             ChatAPIRouter(
-                history_getter=self.history_getter,
+                history_getter=self.history_factory,
                 chat_handler=self.chat_handler,
             ),
             prefix="/api",
