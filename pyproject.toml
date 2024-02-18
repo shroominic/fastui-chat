@@ -1,9 +1,9 @@
 [project]
 name = "fastui-chat"
-version = "0.3.0"
+version = "0.3.1"
 description = "Minimalistic chatbot ui using fastapi, fastui and langchain."
 authors = [{ name = "Shroominic", email = "contact@shroominic.com" }]
-dependencies = ["funcchain>=0.2.2", "fastui[fastapi]>=0.4", "uvicorn>=0.25"]
+dependencies = ["funcchain>=0.3.1", "fastui[fastapi]>=0.4"]
 readme = "README.md"
 requires-python = ">= 3.10"
 license = "MIT"
@@ -32,6 +32,7 @@ dev-dependencies = [
     "redis>=5.0.1",
     "langchain_community",
     "funcchain[llamacpp] @ file:///Users/fungus/dev/funcchain",
+    "uvicorn>=0.25",
 ]
 
 [tool.rye.scripts]
