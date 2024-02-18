@@ -1,6 +1,6 @@
 [project]
 name = "fastui-chat"
-version = "0.3.1"
+version = "0.3.2"
 description = "Minimalistic chatbot ui using fastapi, fastui and langchain."
 authors = [{ name = "Shroominic", email = "contact@shroominic.com" }]
 dependencies = ["funcchain>=0.3.1", "fastui[fastapi]>=0.4"]
