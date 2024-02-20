@@ -21,7 +21,7 @@ app = FastAPI()
 
 # add the chatui router to your app
 app.include_router(
-    ChatAPIRouter(history_factory, chat_handler),
+    ChatAPIRouter(history_factory, chat_handler, streaming_enabled=False),
     prefix="/api",
 )
 
