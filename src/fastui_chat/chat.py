@@ -42,10 +42,12 @@ class ChatAPIRouter(APIRouter):
         self,
         history_getter: ChatHistoryFactory,
         chat_handler: ChatHandler,
+        streaming_enabled: bool = True,
         *args,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
+        self.streaming_enabled = streaming_enabled
         self.get_chat_session = create_get_chat_session_dependency(
             history_getter, chat_handler
         )
@@ -137,10 +139,12 @@ class ChatAPIRouter(APIRouter):
             return [
                 ChatMessage("human", user_msg),
                 c.ServerLoad(
-                    path=f"/chat/{session_id}/generate/response?user_msg={user_msg}",
+                    path=f"/chat/{session_id}/generate/response"
+                    + ("/stream" if self.streaming_enabled else "")
+                    + f"?user_msg={user_msg}",
                     load_trigger=PageEvent(name="generate-response"),
                     components=[c.Text(text="...")],
-                    sse=True,
+                    sse=self.streaming_enabled,
                 ),
                 ChatInputForm(
                     submit_url=f"/api/chat/{session_id}/generate",
@@ -148,13 +152,31 @@ class ChatAPIRouter(APIRouter):
                 ),
             ]
 
-        @self.get("/chat/{session_id}/generate/response")
+        @self.get(
+            "/chat/{session_id}/generate/response",
+            response_model=FastUI,
+            response_model_exclude_none=True,
+        )
         async def chat_generate_response(
             user_msg: str,
             session: Annotated[ChatSession, Depends(self.get_chat_session)],
+        ) -> list[AnyComponent]:
+            """
+            Endpoint for showing the Chat Generate Response UI.
+            """
+            return [
+                ChatMessage(
+                    "ai",
+                    (await session.ainvoke(HumanMessage(content=user_msg))).content,
+                )
+            ]
+
+        @self.get("/chat/{session_id}/generate/response/stream")
+        async def chat_generate_response_stream(
+            user_msg: str,
+            session: Annotated[ChatSession, Depends(self.get_chat_session)],
         ) -> StreamingResponse:
-            msg = HumanMessage(content=user_msg)
             return StreamingResponse(
-                stream_response_generator(msg, session),
+                stream_response_generator(HumanMessage(content=user_msg), session),
                 media_type="text/event-stream",
             )
