@@ -16,6 +16,7 @@ class ChatUI(FastAPI):
         chat_handler: ChatHandler | None = None,
         history_backend: type[BaseChatMessageHistory] | None = None,
         history_backend_kwargs: dict[str, Any] = {},
+        streaming_enabled: bool = True,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -32,6 +33,7 @@ class ChatUI(FastAPI):
             ChatAPIRouter(
                 history_getter=self.history_factory,
                 chat_handler=self.chat_handler,
+                streaming_enabled=streaming_enabled,
             ),
             prefix="/api",
         )
