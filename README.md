@@ -6,7 +6,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/shroominic?style=social)](https://x.com/shroominic)
 
 A minimalistic ChatBot Interface in pure python. </br>
-Build on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core](https://github.com/langchain-ai/langchain).
+Build on top of [FastUI](https://github.com/pydantic/FastUI) and [Funcchain](https://github.com/shroominic/funcchain).
 
 ## Usage
 
