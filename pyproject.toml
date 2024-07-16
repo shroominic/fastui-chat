@@ -31,7 +31,6 @@ dev-dependencies = [
     "python-dotenv>=1",
     "redis>=5.0.1",
     "langchain_community",
-    "funcchain[llamacpp] @ file:///Users/fungus/dev/funcchain",
     "uvicorn>=0.25",
 ]
 
